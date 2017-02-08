@@ -53,4 +53,7 @@ Configuration
    Set its value depending on other middlewares you may have enabled already.
 
 2. Enable the middleware using ``SPLITVARIANTS_ENABLED`` set to ``True``
-   in your ``setting.py``.
+   in your ``settings.py``.
+
+3. Set a custom key to use when splitting items by using the ``SPLITVARIANTS_KEY``
+   scrapy setting.

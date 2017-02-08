@@ -18,7 +18,8 @@ class TestItem(DictItem):
         'name': Field(),
         'size': Field(),
         'price': Field(),
-        'variants': Field()
+        'variants': Field(),
+        'split_by': Field(),
     }
 
 
@@ -42,6 +43,32 @@ class SplitVariantsTest(TestCase):
         item = {"id": 12,
                 "name": "Big chair",
                 "variants": [{"size": "XL", "price": 200},
+                             {"size": "L", "price": 220}]}
+
+        # Define how split items should look
+        expected = [
+            {"id": 12, "name": "Big chair", "size": "XL", "price": 200},
+            {"id": 12, "name": "Big chair", "size": "L", "price": 220}]
+
+        # Calling middleware for given result as a Scrapy Item()
+        result = [TestItem(item)]
+        result = mware.process_spider_output(self.response, result,
+                                             self.spider)
+        self.assertEquals(list(result), expected)
+
+
+    def test_variants_splitted_custom_key(self):
+        """
+        Checks if item with variants is split as expected using a custom key
+        """
+        settings = {"SPLITVARIANTS_ENABLED": True, "SPLITVARIANTS_KEY": "split_by"}
+        crawler = get_crawler(settings_dict=settings)
+        mware = SplitVariantsMiddleware.from_crawler(crawler)
+
+        # Define item with variants
+        item = {"id": 12,
+                "name": "Big chair",
+                "split_by": [{"size": "XL", "price": 200},
                              {"size": "L", "price": 220}]}
 
         # Define how split items should look
